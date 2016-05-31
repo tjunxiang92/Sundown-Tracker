@@ -25,7 +25,9 @@ no=%s&
 end_range = start_range + total
 try:
 	# Searches for the last record saved on the server
-	start_range = int(os.listdir('records21')[-1][:-4]) + 1
+	ls = os.listdir('records21')
+	ls.sort()
+	start_range = int(ls[-1][:-4]) + 1
 except:
 	pass
 

@@ -1,6 +1,10 @@
 from burp import *
-import time
+import time, os
 
+start_range = 20001
+folder		= 'records21'
+total		= 20000
+skip_errors = [1003]
 c = """
 POST /SundownSrv/1xcessResult HTTP/1.1
 Cookie: JSESSIONID=63FD1BCDB0DB6184606A7B63FE98C5F5
@@ -14,11 +18,28 @@ Content-Length: 9
 no=%s&
 """
 
-for i in range(40001, 47468):
+end_range = start_range + total
+try:
+	start_range = int(os.listdir('records21')[-1][:-4]) + 1
+except:
+	pass
+
+for i in range(start_range, end_range):
+	## Sleep for a while
+	if i % 10 == 0:
+		print '%d%% Done. %d/%d' % (((i - start_range) * 100) / total, (i - start_range), end_range - start_range)
+		time.sleep(3)
+
 	r = code('http', c % (i))
-	with open('records/%d.txt' % (i), 'w') as f:
+
+	rjson = r.json()
+	if not rjson[u'result'] == 0:
+		if rjson[u'result'] in skip_errors:
+			continue
+		print 'Error: %d, Code: %d' % (rjson[u'result'], i)
+		exit()
+
+	with open('%s/%d.txt' % (folder, i), 'w') as f:
 		f.write(r.text.encode('ascii', 'ignore').decode('ascii'))
 
-	if i % 10 == 0:
-		print 'Sleeping'
-		time.sleep(3)
+	

@@ -22,6 +22,7 @@ Content-Length: 9
 no=%s&
 """
 
+thres_cnt = error_threshold
 end_range = start_range + total
 try:
 	# Searches for the last record saved on the server
@@ -48,13 +49,14 @@ for i in range(start_range, end_range):
 			continue
 
 		# If Error above a certain threshold then quit application		
-		error_threshold = error_threshold - 1
-		if error_threshold > 0:
+		thres_cnt = thres_cnt - 1
+		if thres_cnt > 0:
 			print 'Error: %d, Code: %d' % (rjson[u'result'], i)
 			continue
 
 		exit()
 
+	thres_cnt = error_threshold
 	# Save to a file
 	with open('%s/%d.txt' % (folder, i), 'w') as f:
 		f.write(r.text.encode('ascii', 'ignore').decode('ascii'))
